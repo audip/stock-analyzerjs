@@ -8,8 +8,12 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-var routes = require("./routes/routes.js")(app);
 
+app.use(express.static('public'));
+app.use(express.static('files'));
+// app.use('/css', express.static(__dirname + '/public'));
+var routes = require("./routes.js")(app);
+var data_test = 20;
 // Generic error handler used by all endpoints.
 function handleError(res, reason, message, code) {
   console.log("ERROR: " + reason);

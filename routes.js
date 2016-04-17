@@ -5,6 +5,9 @@ var forecast = require('nostradamus');
 var regex = require('regex');
 var sentiment = require('sentiment');
 var Twitter = require('twitter');
+var path = require('path');
+
+var app = express();
 
 var client = new Twitter({
   consumer_key: 'YvkutpGKLE5GF7tTgj6C6Rl2N',
@@ -13,11 +16,13 @@ var client = new Twitter({
   access_token_secret: 'U8qdm7Z83W3mzIYPQ12RW2x9wKVuALYxEjzgb3xTpfRKD'
 });
 
+app.use(express.static('public'));
 var appRouter = function(app) {
-    app.get("/", function(req, res, next) {
-      res.statusCode = 200;
-      res.send("This is an API server.");
-    });
+	app.use(express.static('public'));
+
+	app.get('/', function(req, res) {
+    res.sendFile(path.join(__dirname + '/index.html'));
+	});
 
     app.get("/api/stockanalysis/:stock", function(req, res, next) {
       var stockQuotes = [];
@@ -52,7 +57,6 @@ var appRouter = function(app) {
           if (nostroData.length % m !== 0)
               nostroData.splice(0, 0, 0);
           res.send(forecast(nostroData, alpha, beta, gamma, period, m));
-
         }
       });
     });

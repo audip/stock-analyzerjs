@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<!--[if gt IE 8]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+    <head>
+        <!-- Mobile Specific Meta -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Always force latest IE rendering engine -->
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <!-- meta character set -->
+        <meta charset="utf-8">
+
+        <!-- Site Title -->
+        <title>Hack DFW</title>
+
+        <!--
+        Google Fonts
+        ============================================= -->
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700" rel="stylesheet" type="text/css">
+		        <script src="./js/vendor/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+        <!-- Fontawesome -->
+        <link rel="stylesheet" href="./css/font-awesome.min.css">
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="./css/bootstrap.min.css">
+        <!-- Fancybox -->
+        <link rel="stylesheet" href="./css/jquery.fancybox.css">
+        <!-- owl carousel -->
+        <link rel="stylesheet" href="./css/owl.carousel.css">
+        <!-- Animate -->
+        <link rel="stylesheet" href="./css/animate.css">
+        <!-- Main Stylesheet -->
+        <link rel="stylesheet" href="./css/main.css">
+        <!-- Main Responsive -->
+        <link rel="stylesheet" href="./css/responsive.css">
+
+        <link rel="stylesheet" href="./css/materialize.css">
+		
+        <script src="./js/vendor/modernizr-2.6.2.min.js"></script>
+
+
+    </head>
+
+    <body>
+        <header id="navigation" class="navbar-fixed-top" style="max-height:100px">
+            <div class="container">
+                <div class="navbar-header" style="max-height:100px">
+				 <div class="navbar-brand">
+                            <img src="img/stockly.png" alt="Logo" style="padding-bottom:4px;max-width:50%;max-height:50%">
+                    </div>
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    </div>
+
+                    <!-- main nav -->
+                    <nav class="collapse navigation navbar-collapse navbar-right" role="navigation">
+                        <ul id="nav" class="nav navbar-nav">
+                            <li class="current"><a href="#home">Home</a></li>
+                            <li><a href="#charts">Charts</a></li>
+                        </ul>
+                    </nav>
+                    <!-- /main nav -->
+                </div>
+
+            </div>
+        </header>
+        <section id="home">
+            <div id="home-carousel" class="carousel slide" data-interval="false">
+                <ol class="carousel-indicators">
+                    <li data-target="#home-carousel" data-slide-to="0" class="active"></li>
+                </ol>
+                <!--/.carousel-indicators-->
+				<form id="form_search">
+					<div class="carousel-inner">
+						<div class="item active"  style="background-image: url('./img/slider/1.jpg')" >
+							<div align="center" class="carousel-caption" style="width:100%">
+									<div class="row" id="input" style="width:100%; background-color:transparent">
+												<input type="text" id="searchStock" style="text-align:center; valign:middle; font-size:32; font-weight:700; background-color: rgba(251, 251, 251, 0.58); color:Black" autocomplete="off"/> 
+												<input hidden="true" type="submit" id="searchButton">
+									</div>
+							</div>
+						</div>
+					</div>
+				</form>
+            </div>
+        </section>
+
+        <section id="charts">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="section-title text-center wow fadeInDown">
+                            <h2>Stocks</h2>
+                            <p>Prediction helps better stock investment decisions by providing statistical results for future stock purchasing habits!</p>
+                        </div>
+                    </div>
+                </div>
+				
+                <div class="row">
+                    <div class="col-md-6 col-sm-12 wow fadeInLeft">
+                        <div class="media">
+								<div id="myDiv" style="width: 480px; height: 400px;"><!-- Plotly chart will be drawn inside this DIV --></div>
+						</div>
+                    </div>
+
+                    <div class="col-md-6 col-sm-12 wow fadeInRight" data-wow-delay="0.2s">
+                        <div class="media">
+								<div id="myDiv1" style="width: 480px; height: 400px;"><!-- Plotly chart will be drawn inside this DIV --></div>
+						</div>
+					<!-- <script src="../static/charts.js"></script> -->
+                </div> <!-- end .row -->
+            </div> <!-- end .container -->
+        </section>
+	
+		<script type="text/javascript" >
+			var stock = $("#form_search>searchStock").val();
+			console.log(stock);
+
+        $.get("/api/twittersentiment/AAPL",
+        function(json_data, textStatus)
+        {
+				var positive = json_data["positive"];
+				var negative = json_data["negative"];
+				var positive_percent = positive/(positive+negative)*100;
+				var negative_percent = negative/(positive+negative)*100;
+				var data = [{
+				  values: [positive_percent, negative_percent],
+				  labels: ['Positive sentiment', 'Negative sentiment'],
+				  type: 'pie'
+				}];
+
+				var layout = {
+				  height: 400,
+				  width: 500
+				};
+
+				Plotly.newPlot('myDiv1', data, layout);
+
+        }); 
+		$.get("/api/stockanalysis/AAPL",
+        function(data, textStatus)
+        {
+                //console.log("Response from server: " + data);
+				var data_series = [];
+				data.forEach(function(d){
+					if(d != 0) {
+						data_series.push(d);
+					}
+				});
+				var len = data_series.length;
+				var time = [];
+				for(i=1;i<len-1;i++){
+					time.push(i);
+				}
+				console.log(time);
+					var trace = {
+					  x: time,
+					  y: data_series,
+					  mode: 'lines',
+					  name: 'Stock Price Index'
+					};
+					var data = [trace];
+
+					var layout = {
+					  title:'Forecasted stock price against time'
+					};
+
+					Plotly.newPlot('myDiv', data, layout);
+        }); 
+
+			/*$("#searchButton").on('click',function (e){    
+				$.ajax({
+			   type:'GET',
+			   url :"/api/stockanalysis/"+stock,
+			   success: function(data) {
+					console.log('success',data);
+					
+				},
+				error:function(exception){console.log('Exeption:'+exception);}
+				}); 
+				e.preventDefault();
+				});*/
+		</script>
+
+        <!-- main jQuery -->
+		<!-- <script src="http://code.highcharts.com/highcharts.js"></script>
+		<script src="../static/dark-unica.js"></script> -->
+        <!-- Bootstrap -->
+		<!-- Latest compiled and minified plotly.js JavaScript -->
+
+        <script src="./js/bootstrap.min.js"></script>
+        <!-- jquery.nav -->
+        <script src="./js/jquery.nav.js"></script>
+        <!-- Portfolio Filtering -->
+        <script src="./js/jquery.mixitup.min.js"></script>
+        <script src="./js/jquery.appear.js"></script>
+        <script src="./js/owl.carousel.min.js"></script>
+        <!-- WOW script -->
+        <script src="./js/wow.min.js"></script>
+        <!-- theme custom scripts -->
+        <script src="./js/main.js"></script>
+    </body>
+</html>
