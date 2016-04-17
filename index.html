@@ -96,22 +96,29 @@
 		
 
         <section id="charts">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="section-title text-center wow fadeInDown">
-                            <h2>Stocks</h2>
-                            <p>Prediction helps better stock investment decisions by providing statistical results for future stock purchasing habits!</p>
-                        </div>
-                    </div>
-                </div>
-				
-                <div class="row">
-                    <div class="col-md-6 col-sm-12 wow fadeInLeft">
-                        <div class="media">
-								<div id="myDiv" style="width: 480px; height: 400px;"><!-- Plotly chart will be drawn inside this DIV --></div>
+             <div class="container">
+				  <div class="row">
+					<div class="col-md-12">
+					  <div class="section-title text-center wow fadeInDown">
+						<h2>Stocks</h2>
+						<p>Prediction helps better stock investment decisions by providing statistical results for future stock purchasing habits!</p>
+					  </div>
+					</div>
+				  </div>
+				  <div class="row">
+					  <div class="col-md-12">
+						  <span class="forecast_value" style="font-weight:bold;font-variant:small-caps;margin:auto;text-align:center;font-size:1.5em"></span>
+					  </div>
+				  </div>
+
+				  <div class="row">
+					<div class="col-md-6 col-sm-12 wow fadeInLeft">
+					  <div class="media">
+						<div id="myDiv" style="width: 600px; height: 500px;">
+						  <!-- Plotly chart will be drawn inside this DIV -->
 						</div>
-                    </div>
+					  </div>
+					</div>
 
                     <div class="col-md-6 col-sm-12 wow fadeInRight" data-wow-delay="0.2s">
                         <div class="media">
@@ -129,8 +136,21 @@
         {
 				var positive = json_data["positive"];
 				var negative = json_data["negative"];
-				var positive_percent = positive/(positive+negative)*100;
-				var negative_percent = negative/(positive+negative)*100;
+				var predictions = json_data["prediction"];
+				var predicted_list = predictions.split(",");
+				var stock_forecast = predicted_list[0].trim();
+				var degree_of_confidence = predicted_list[4].trim();
+				console.log(stock_forecast);
+				if(stock_forecast == "BUY"){
+					$(".forecast_value").html( "<p style='color:#2ecc71'>BUY the stock, the prediction model shows that price will increase over time and shows people are enthusiatic about the stock, <em></em>making this prediction with a "+degree_of_confidence+"% degree of confidence.</em></p>" );
+				} else if (stock_forecast == "SELL") {
+					$(".forecast_value").html( "<p style='color:#e74c3c'>SELL the stock, the prediction model shows that price will decline over time and shows people are cautious about the stock, <em></em>making this prediction with a "+degree_of_confidence+"% degree of confidence.</em></p>" );
+				} else {
+					$(".forecast_value").html( "<p style='color:#f39c12'>HOLD, just sit tight and hold on to your stock. <em>Stockly predicts the stock value with "+degree_of_confidence+"% degree of confidence</em></p>" );
+				}
+
+				var positive_percent = positive / (positive + negative) * 100;
+				var negative_percent = negative / (positive + negative) * 100;
 				var data = [{
 				  values: [positive_percent, negative_percent],
 				  labels: ['Positive sentiment', 'Negative sentiment'],
