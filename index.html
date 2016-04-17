@@ -73,20 +73,27 @@
                     <li data-target="#home-carousel" data-slide-to="0" class="active"></li>
                 </ol>
                 <!--/.carousel-indicators-->
-				<form id="form_search">
 					<div class="carousel-inner">
 						<div class="item active"  style="background-image: url('./img/slider/1.jpg')" >
 							<div align="center" class="carousel-caption" style="width:100%">
 									<div class="row" id="input" style="width:100%; background-color:transparent">
-												<input type="text" id="searchStock" style="text-align:center; valign:middle; font-size:32; font-weight:700; background-color: rgba(251, 251, 251, 0.58); color:Black" autocomplete="off"/> 
-												<input hidden="true" type="submit" id="searchButton">
+												<input type="text" id="searchStock" style="text-align:center; valign:middle; font-size:32; font-weight:700; background-color: rgba(251, 251, 251, 0.58); color:Black" autocomplete="off"/>
 									</div>
 							</div>
 						</div>
 					</div>
-				</form>
             </div>
         </section>
+		<script>
+		var stock;
+				$("#searchStock").keyup(function (e) {
+					if (e.keyCode == 13) {
+						stock = $("#searchStock").val();
+					}
+					Refresh();
+				});
+		</script>
+		
 
         <section id="charts">
             <div class="container">
@@ -116,10 +123,8 @@
         </section>
 	
 		<script type="text/javascript" >
-			var stock = $("#form_search>searchStock").val();
-			console.log(stock);
-
-        $.get("/api/twittersentiment/AAPL",
+		function Refresh(){
+			$.get("/api/twittersentiment/"+stock,
         function(json_data, textStatus)
         {
 				var positive = json_data["positive"];
@@ -140,7 +145,7 @@
 				Plotly.newPlot('myDiv1', data, layout);
 
         }); 
-		$.get("/api/stockanalysis/AAPL",
+		$.get("/api/stockanalysis/"+stock,
         function(data, textStatus)
         {
                 //console.log("Response from server: " + data);
@@ -169,20 +174,8 @@
 					};
 
 					Plotly.newPlot('myDiv', data, layout);
-        }); 
-
-			/*$("#searchButton").on('click',function (e){    
-				$.ajax({
-			   type:'GET',
-			   url :"/api/stockanalysis/"+stock,
-			   success: function(data) {
-					console.log('success',data);
-					
-				},
-				error:function(exception){console.log('Exeption:'+exception);}
-				}); 
-				e.preventDefault();
-				});*/
+        });
+		}   
 		</script>
 
         <!-- main jQuery -->
