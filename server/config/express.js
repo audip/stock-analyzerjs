@@ -40,11 +40,12 @@ export default function(app) {
   app.use(session({
     secret: config.secrets.session,
     saveUninitialized: true,
-    resave: false,
-    store: new MongoStore({
-      mongooseConnection: mongoose.connection,
-      db: 'stock-analyzer'
-    })
+    resave: false
+    //,
+    // store: new MongoStore({
+    //   mongooseConnection: mongoose.connection,
+    //   db: 'stock-analyzer'
+    // })
   }));
 
   /**
